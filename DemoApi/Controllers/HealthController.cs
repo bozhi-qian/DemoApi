@@ -13,7 +13,7 @@ namespace DemoApi.Controllers
             return Ok("Healthy");
         }
 
-        [HttpGet("{key:string}")]
+        [HttpGet("{key}")]
         public async Task<IActionResult> GetMySecret(string key)
         {
             var myCacheData = await cacheService.GetCacheDataAsync(key);
