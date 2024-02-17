@@ -10,7 +10,7 @@ namespace DemoApi.Controllers
     [ApiController]
     public class MyCacheController : ControllerBase
     {
-        readonly ICacheService _cacheService;
+        private readonly ICacheService _cacheService;
         public MyCacheController(ICacheService cacheService)
         {
             _cacheService = cacheService;

@@ -14,12 +14,12 @@ builder.Services.AddSwaggerGen();
 
 var expirationTime = TimeSpan.FromDays(2); // Default expiration time
 var redisCacheSettings = builder.Configuration.GetSection("RedisCache").Get<RedisCacheSettings>();
-if (redisCacheSettings != null)
-{
-    expirationTime = redisCacheSettings.ExpirationTime;
-}
+if(redisCacheSettings == null) throw new ArgumentNullException(nameof(redisCacheSettings));
 
+expirationTime = redisCacheSettings.ExpirationTime;
 var redisConnectionString = redisCacheSettings.ConnectionStrings; // builder.Configuration["RedisCache:ConnectionStrings"];
+if(string.IsNullOrEmpty(redisConnectionString)) throw new ArgumentNullException(nameof(redisConnectionString));
+
 builder.Services.AddStackExchangeRedisCache(o =>
 {
     o.Configuration = redisConnectionString;
