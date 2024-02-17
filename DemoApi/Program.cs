@@ -1,3 +1,4 @@
+using Azure.Identity;
 using DemoApi.Configurations;
 using DemoApi.Services;
 using Microsoft.Extensions.Caching.Distributed;
@@ -8,6 +9,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+var keyVaultName = builder.Configuration["KeyVaultName"];
+var keyVaultUrl = $"https://{keyVaultName}.vault.azure.net/";
+Console.WriteLine($"Key Vault URL: {keyVaultUrl}");
+
+builder.Configuration.AddAzureKeyVault(
+    new Uri(keyVaultUrl),
+    new DefaultAzureCredential());
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -17,7 +27,7 @@ var redisCacheSettings = builder.Configuration.GetSection("RedisCache").Get<Redi
 if(redisCacheSettings == null) throw new ArgumentNullException(nameof(redisCacheSettings));
 
 expirationTime = redisCacheSettings.ExpirationTime;
-var redisConnectionString = redisCacheSettings.ConnectionStrings; // builder.Configuration["RedisCache:ConnectionStrings"];
+var redisConnectionString = builder.Configuration["RedisCache:ConnectionStrings"]; // this is read from Azure Key Vault.
 if(string.IsNullOrEmpty(redisConnectionString)) throw new ArgumentNullException(nameof(redisConnectionString));
 
 builder.Services.AddStackExchangeRedisCache(o =>
